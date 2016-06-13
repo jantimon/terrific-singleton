@@ -1,0 +1,11 @@
+{
+  "name": "terrifc-singleton",
+  "version": "0.0.1",
+  "description": "helper module to use terrific in react projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jan Nicklas <j.nicklas@me.com>",
+  "license": "MIT"
+}
