@@ -1,6 +1,6 @@
 {
-  "name": "terrifc-singleton",
-  "version": "0.0.1",
+  "name": "terrific-singleton",
+  "version": "0.0.2",
   "description": "helper module to use terrific in react projects",
   "main": "index.js",
   "scripts": {
