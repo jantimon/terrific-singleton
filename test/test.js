@@ -6,7 +6,7 @@ var sinon = require('sinon');
 
 describe('terrific-singleton', function () {
   var ts;
-  jsdom({skipWindowCheck : true});
+  jsdom({skipWindowCheck: true});
 
   before(function () {
     ts = require('../index.js');
@@ -117,6 +117,14 @@ describe('terrific-singleton', function () {
       ts.stopNode(el);
       assert.equal(el.getAttribute('data-t-id'), null);
     });
-
+    it('does not fail if a node was already destroyed', function () {
+      var el = document.createElement('div');
+      el.setAttribute('data-t-name', 'TestStopMod');
+      ts.startNode(el);
+      assert.isString(el.getAttribute('data-t-id'));
+      ts.stopNode(el);
+      ts.stopNode(el);
+      assert.equal(el.getAttribute('data-t-id'), null);
+    });
   });
 });
