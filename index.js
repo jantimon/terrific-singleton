@@ -3,7 +3,12 @@ var mainApplication = new T.Application();
 
 module.exports = {
   mainApplication: mainApplication,
-  startNode: function(domNode) {
+
+  startNode: function (domNode) {
+    // if the node was already started return the module
+    if (domNode.hasAttribute('data-t-id')) {
+      return mainApplication.getModuleById(domNode.getAttribute('data-t-id'));
+    }
     // get terrific component name
     var dataName = domNode.getAttribute('data-t-name');
     // link terrific component to dom node
@@ -14,12 +19,26 @@ module.exports = {
     // execute terrific component
     mainApplication.start([mod]);
     // Return the public api and events
-    return {
-      api: mod.api || {},
-      events: mod._events
-    };
+    return mod;
   },
-  createModule: function(moduleName, moduleDefinitions) {
+
+  stopNode: function (domNode) {
+    if (domNode.hasAttribute('data-t-id')) {
+      // link terrific component to dom node
+      var id = domNode.getAttribute('data-t-id');
+      var modules = {};
+      modules[id] = mainApplication.getModuleById(id);
+      mainApplication.stop(modules);
+      mainApplication.unregisterModules(modules);
+    }
+  },
+
+  bootstrap: function () {
+    mainApplication.registerModules();
+    mainApplication.start();
+  },
+
+  createModule: function (moduleName, moduleDefinitions) {
     if (typeof moduleName !== 'string' || !/^[A-Z][a-z0-9\-]+[a-z0-9]/.test(moduleName)) {
       throw new Error('Invalid module name "' + moduleName + '".');
     }
@@ -33,7 +52,8 @@ module.exports = {
 
 // Inherit from terrific
 for (var attribute in T) {
-  if( T.hasOwnProperty( attribute ) && typeof attribute === 'function' ) {
+  /* istanbul ignore else */
+  if (T.hasOwnProperty(attribute)) {
     module.exports[attribute] = module.exports[attribute] || T[attribute];
   }
 }

@@ -1,12 +1,13 @@
 {
   "name": "terrific-singleton",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "helper module to use terrific in react projects",
   "repository": "https://github.com/jantimon/terrific-singleton",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
-    "test-travis": "istanbul cover _mocha -- -R spec"
+    "test": "istanbul cover _mocha -- -R spec",
+    "iron-node": "iron-node node_modules/mocha/bin/_mocha",
+    "posttest": "semistandard"
   },
   "author": "Jan Nicklas <j.nicklas@me.com>",
   "contributors": [
@@ -22,7 +23,9 @@
     "istanbul": "^0.4.3",
     "jsdom": "^9.2.1",
     "mocha": "^2.5.3",
-    "mocha-jsdom": "^1.1.0"
+    "mocha-jsdom": "^1.1.0",
+    "semistandard": "^8.0.0",
+    "sinon": "^1.17.4"
   },
   "dependencies": {
     "terrific": "^3.0.0"
