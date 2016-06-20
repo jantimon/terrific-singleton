@@ -25,7 +25,8 @@
     "mocha": "^2.5.3",
     "mocha-jsdom": "^1.1.0",
     "semistandard": "^8.0.0",
-    "sinon": "^1.17.4"
+    "sinon": "^1.17.4",
+    "terrific": "^3.0.0"
   },
   "peerDependencies": {
     "terrific": "^3.0.0"
