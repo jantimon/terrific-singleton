@@ -35,7 +35,7 @@ module.exports = {
 
   bootstrap: function () {
     mainApplication.registerModules();
-    mainApplication.start();
+    return mainApplication.start();
   },
 
   createModule: function (moduleName, moduleDefinitions) {

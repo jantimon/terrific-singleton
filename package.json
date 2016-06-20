@@ -1,6 +1,6 @@
 {
   "name": "terrific-singleton",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "helper module to use terrific in react projects",
   "repository": "https://github.com/jantimon/terrific-singleton",
   "main": "index.js",
@@ -27,7 +27,7 @@
     "semistandard": "^8.0.0",
     "sinon": "^1.17.4"
   },
-  "dependencies": {
+  "peerDependencies": {
     "terrific": "^3.0.0"
   }
 }
