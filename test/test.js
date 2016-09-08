@@ -49,6 +49,16 @@ describe('terrific-singleton', function () {
       var mod = ts.createModule('SomeMod', {});
       assert.isFunction(mod);
     });
+    it('can be initialized with a class', function () {
+      function ModuleClass () { }
+      ModuleClass.prototype.start = function (resolve) {
+        resolve();
+      };
+      ModuleClass.prototype.stop = function () {
+      };
+      var mod = ts.createModule('ClassMod', ModuleClass);
+      assert.isFunction(mod);
+    });
     it('fails for double registration', function () {
       assert.throws(function () {
         ts.createModule('SomeMod', {});
@@ -110,7 +120,7 @@ describe('terrific-singleton', function () {
   describe('stopNode', function () {
     it('destroys a initialized node', function () {
       var el = document.createElement('div');
-      ts.createModule('TestStopMod', {});
+      ts.createModule('TestStopMod', {stop: function () {}});
       el.setAttribute('data-t-name', 'TestStopMod');
       ts.startNode(el);
       assert.isString(el.getAttribute('data-t-id'));
@@ -125,6 +135,15 @@ describe('terrific-singleton', function () {
       ts.stopNode(el);
       ts.stopNode(el);
       assert.equal(el.getAttribute('data-t-id'), null);
+    });
+    it('calls the stop method even if the module has its own', function () {
+      var el = document.createElement('div');
+      el.setAttribute('data-t-name', 'TestStopMod');
+      ts.startNode(el);
+      sinon.stub(ts.Module.prototype, 'stop');
+      ts.stopNode(el);
+      assert(ts.Module.prototype.stop.calledOnce);
+      ts.Module.prototype.stop.restore();
     });
   });
 });

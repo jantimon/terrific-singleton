@@ -45,6 +45,18 @@ module.exports = {
     if (T.Module[moduleName]) {
       throw new Error('Module "' + moduleName + '" was already defined.');
     }
+    // Allow to create by class
+    if (moduleDefinitions && moduleDefinitions.prototype && moduleDefinitions.prototype.start) {
+      moduleDefinitions = moduleDefinitions.prototype;
+    }
+    // Fix memory leak in TerrificJs
+    if (moduleDefinitions.hasOwnProperty('stop')) {
+      var stop = moduleDefinitions.stop;
+      moduleDefinitions.stop = function () {
+        T.Module.prototype.stop.apply(this, arguments);
+        stop.apply(this, arguments);
+      };
+    }
     T.Module[moduleName] = T.createModule(moduleDefinitions);
     return T.Module[moduleName];
   }
