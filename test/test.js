@@ -146,4 +146,15 @@ describe('terrific-singleton', function () {
       ts.Module.prototype.stop.restore();
     });
   });
+
+  describe('getModuleByDomNode', function () {
+    it('returns the module', function () {
+      var el = document.createElement('div');
+      var moduleConfig = { demo: function () {} };
+      ts.createModule('TestGetMod', moduleConfig);
+      el.setAttribute('data-t-name', 'TestGetMod');
+      ts.startNode(el);
+      assert.equal(ts.getModuleByDomNode(el).demo, moduleConfig.demo);
+    });
+  });
 });

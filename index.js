@@ -22,12 +22,23 @@ module.exports = {
     return mod;
   },
 
-  stopNode: function (domNode) {
+  /**
+   *  Returns the Terrific Module instance for the given dom node
+   * @param  {HTMLElement} domNode
+   */
+  getModuleByDomNode: function (domNode) {
     if (domNode.hasAttribute('data-t-id')) {
-      // link terrific component to dom node
       var id = domNode.getAttribute('data-t-id');
+      return mainApplication.getModuleById(id);
+    }
+    return undefined;
+  },
+
+  stopNode: function (domNode) {
+    var module = this.getModuleByDomNode(domNode);
+    if (module) {
       var modules = {};
-      modules[id] = mainApplication.getModuleById(id);
+      modules[domNode.getAttribute('data-t-id')] = module;
       mainApplication.stop(modules);
       mainApplication.unregisterModules(modules);
     }
