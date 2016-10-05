@@ -8,5 +8,5 @@ interface ITerrificSpec {
 export function createModule(name:string, spec: ITerrificSpec): TerrificModule;
 export function startNode(node: Node): TerrificModule;
 export function stopNode(node: Node): void;
-export function getModuleByDom(node: HTMLElement): TerrificSpec;
+export function getModuleByDomNode(node: HTMLElement): TerrificSpec;
 export function bootstrap(): void;

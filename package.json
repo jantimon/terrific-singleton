@@ -1,6 +1,6 @@
 {
   "name": "terrific-singleton",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "helper module to use terrific in react projects",
   "repository": "https://github.com/jantimon/terrific-singleton",
   "main": "index.js",
