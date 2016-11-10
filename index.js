@@ -1,13 +1,17 @@
 var T = require('terrific');
 var mainApplication = new T.Application();
 
+// The deferred bootstrap holds a promise which will be fullfilled
+// once the main application was bootet
+var deferredMainApplicationStarted = createDeferred();
+
 module.exports = {
   mainApplication: mainApplication,
 
   startNode: function (domNode) {
     // if the node was already started return the module
     if (domNode.hasAttribute('data-t-id')) {
-      return mainApplication.getModuleById(domNode.getAttribute('data-t-id'));
+      return Promise.resolve(mainApplication.getModuleById(domNode.getAttribute('data-t-id')));
     }
     // get terrific component name
     var dataName = domNode.getAttribute('data-t-name');
@@ -16,10 +20,12 @@ module.exports = {
     if (!mod) {
       throw new Error('starting terrific component "' + dataName + '" failed.');
     }
-    // execute terrific component
-    mainApplication.start([mod]);
-    // Return the public api and events
-    return mod;
+    return deferredMainApplicationStarted.promise.then(function () {
+      // execute terrific component
+      mainApplication.start([mod]);
+      // Return the public api and events
+      return mod;
+    });
   },
 
   /**
@@ -46,7 +52,10 @@ module.exports = {
 
   bootstrap: function () {
     mainApplication.registerModules();
-    return mainApplication.start();
+    mainApplication.start().then(function (result) {
+      deferredMainApplicationStarted.resolve(result);
+      return result;
+    });
   },
 
   createModule: function (moduleName, moduleDefinitions) {
@@ -79,4 +88,16 @@ for (var attribute in T) {
   if (T.hasOwnProperty(attribute)) {
     module.exports[attribute] = module.exports[attribute] || T[attribute];
   }
+}
+
+/**
+ * Create a deferred promise object
+ */
+function createDeferred () {
+  var deferred = {};
+  deferred.promise = new Promise(function (resolve, reject) {
+    deferred.resolve = resolve;
+    deferred.reject = reject;
+  });
+  return deferred;
 }

@@ -68,7 +68,7 @@ describe('terrific-singleton', function () {
 
   describe('bootstrap', function () {
     it('launches the main application', function () {
-      sinon.stub(ts.mainApplication, 'start');
+      sinon.stub(ts.mainApplication, 'start').onCall(0).returns(Promise.resolve());
       sinon.stub(ts.mainApplication, 'registerModules');
       ts.bootstrap();
       assert(ts.mainApplication.start.calledOnce);
@@ -100,20 +100,30 @@ describe('terrific-singleton', function () {
     it('returns object for correctly setup module', function () {
       var el = document.createElement('div');
       el.setAttribute('data-t-name', 'TestMod');
+      sinon.stub(ts.mainApplication, 'start').onCall(0).returns(Promise.resolve());
+      sinon.stub(ts.mainApplication, 'registerModules');
       ts.createModule('TestMod', {});
-      var node = ts.startNode(el);
-      assert.isObject(node);
-      assert.equal(node._ctx, el);
-      assert.isObject(node._events);
+      ts.bootstrap();
+      return ts.startNode(el).then(function (node) {
+        assert.isObject(node);
+        assert.equal(node._ctx, el);
+        assert.isObject(node._events);
+        ts.mainApplication.start.restore();
+        ts.mainApplication.registerModules.restore();
+      });
     });
     it('allows to be executed twice', function () {
       var el = document.createElement('div');
       el.setAttribute('data-t-name', 'TestMod');
-      ts.startNode(el);
-      var node = ts.startNode(el);
-      assert.isObject(node);
-      assert.equal(node._ctx, el);
-      assert.isObject(node._events);
+      return ts.startNode(el)
+        .then(function () {
+          return ts.startNode(el);
+        })
+        .then(function (node) {
+          assert.isObject(node);
+          assert.equal(node._ctx, el);
+          assert.isObject(node._events);
+        });
     });
   });
 
