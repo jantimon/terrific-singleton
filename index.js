@@ -59,7 +59,7 @@ module.exports = {
   },
 
   createModule: function (moduleName, moduleDefinitions) {
-    if (typeof moduleName !== 'string' || !/^[A-Z][a-z0-9\-]+[a-z0-9]/.test(moduleName)) {
+    if (typeof moduleName !== 'string' || !/^[A-Z][A-Za-z0-9]+/.test(moduleName)) {
       throw new Error('Invalid module name "' + moduleName + '".');
     }
     if (T.Module[moduleName]) {
