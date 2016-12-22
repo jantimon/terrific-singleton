@@ -1,15 +1,19 @@
 'use strict';
 /* global it, before, describe */
 var jsdom = require('mocha-jsdom');
-var assert = require('chai').assert;
+var chai = require('chai');
+chai.use(require('chai-as-promised'));
+var assert = chai.assert;
 var sinon = require('sinon');
 
 describe('terrific-singleton', function () {
   var ts;
   jsdom({skipWindowCheck: true});
+  global.Element = { prototype: { matches: function () { return false; } } };
 
   before(function () {
     ts = require('../index.js');
+    ts.bootstrap();
   });
 
   describe('API methods are present', function () {
@@ -80,22 +84,16 @@ describe('terrific-singleton', function () {
 
   describe('startNode', function () {
     it('fails without arguments', function () {
-      assert.throws(function () {
-        ts.startNode();
-      }, Error);
+      return assert.isRejected(ts.startNode(), Error);
     });
     it('fails with given DOM without data-t-name', function () {
       var el = document.createElement('div');
-      assert.throws(function () {
-        ts.startNode(el);
-      }, Error);
+      return assert.isRejected(ts.startNode(el), Error);
     });
     it('fails for incorrectly setup module', function () {
       var el = document.createElement('div');
       el.setAttribute('data-t-name', 'NoMod');
-      assert.throws(function () {
-        ts.startNode(el);
-      }, Error, /starting terrific component/);
+      return assert.isRejected(ts.startNode(el), Error, /starting terrific component/);
     });
     it('returns object for correctly setup module', function () {
       var el = document.createElement('div');
@@ -132,28 +130,34 @@ describe('terrific-singleton', function () {
       var el = document.createElement('div');
       ts.createModule('TestStopMod', {stop: function () {}});
       el.setAttribute('data-t-name', 'TestStopMod');
-      ts.startNode(el);
-      assert.isString(el.getAttribute('data-t-id'));
-      ts.stopNode(el);
-      assert.equal(el.getAttribute('data-t-id'), null);
+      return ts.startNode(el)
+        .then(function () {
+          assert.isString(el.getAttribute('data-t-id'));
+          ts.stopNode(el);
+          assert.equal(el.getAttribute('data-t-id'), null);
+        });
     });
     it('does not fail if a node was already destroyed', function () {
       var el = document.createElement('div');
       el.setAttribute('data-t-name', 'TestStopMod');
-      ts.startNode(el);
-      assert.isString(el.getAttribute('data-t-id'));
-      ts.stopNode(el);
-      ts.stopNode(el);
-      assert.equal(el.getAttribute('data-t-id'), null);
+      return ts.startNode(el)
+        .then(function () {
+          assert.isString(el.getAttribute('data-t-id'));
+          ts.stopNode(el);
+          ts.stopNode(el);
+          assert.equal(el.getAttribute('data-t-id'), null);
+        });
     });
     it('calls the stop method even if the module has its own', function () {
       var el = document.createElement('div');
       el.setAttribute('data-t-name', 'TestStopMod');
-      ts.startNode(el);
-      sinon.stub(ts.Module.prototype, 'stop');
-      ts.stopNode(el);
-      assert(ts.Module.prototype.stop.calledOnce);
-      ts.Module.prototype.stop.restore();
+      return ts.startNode(el)
+        .then(function () {
+          sinon.stub(ts.Module.prototype, 'stop');
+          ts.stopNode(el);
+          assert(ts.Module.prototype.stop.calledOnce);
+          ts.Module.prototype.stop.restore();
+        });
     });
   });
 
@@ -163,8 +167,9 @@ describe('terrific-singleton', function () {
       var moduleConfig = { demo: function () {} };
       ts.createModule('TestGetMod', moduleConfig);
       el.setAttribute('data-t-name', 'TestGetMod');
-      ts.startNode(el);
-      assert.equal(ts.getModuleByDomNode(el).demo, moduleConfig.demo);
+      return ts.startNode(el).then(function () {
+        assert.equal(ts.getModuleByDomNode(el).demo, moduleConfig.demo);
+      });
     });
   });
 });

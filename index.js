@@ -9,18 +9,18 @@ module.exports = {
   mainApplication: mainApplication,
 
   startNode: function (domNode) {
-    // if the node was already started return the module
-    if (domNode.hasAttribute('data-t-id')) {
-      return Promise.resolve(mainApplication.getModuleById(domNode.getAttribute('data-t-id')));
-    }
-    // get terrific component name
-    var dataName = domNode.getAttribute('data-t-name');
-    // link terrific component to dom node
-    var mod = mainApplication.registerModule(domNode, dataName);
-    if (!mod) {
-      throw new Error('starting terrific component "' + dataName + '" failed.');
-    }
     return deferredMainApplicationStarted.promise.then(function () {
+      // if the node was already started return the module
+      if (domNode.hasAttribute('data-t-id')) {
+        return Promise.resolve(mainApplication.getModuleById(domNode.getAttribute('data-t-id')));
+      }
+      // get terrific component name
+      var dataName = domNode.getAttribute('data-t-name');
+      // link terrific component to dom node
+      var mod = mainApplication.registerModule(domNode, dataName);
+      if (!mod) {
+        throw new Error('starting terrific component "' + dataName + '" failed.');
+      }
       // execute terrific component
       mainApplication.start([mod]);
       // Return the public api and events
