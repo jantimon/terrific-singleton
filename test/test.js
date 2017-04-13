@@ -8,12 +8,13 @@ var sinon = require('sinon');
 
 describe('terrific-singleton', function () {
   var ts;
+  var bs;
   jsdom({skipWindowCheck: true});
   global.Element = { prototype: { matches: function () { return false; } } };
 
   before(function () {
     ts = require('../index.js');
-    ts.bootstrap();
+    bs = ts.bootstrap();
   });
 
   describe('API methods are present', function () {
@@ -79,6 +80,10 @@ describe('terrific-singleton', function () {
       ts.mainApplication.start.restore();
       assert(ts.mainApplication.registerModules.calledOnce);
       ts.mainApplication.registerModules.restore();
+    });
+
+    it('returns a Promise', function () {
+      assert(bs instanceof Promise);
     });
   });
 
