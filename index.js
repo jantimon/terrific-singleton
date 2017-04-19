@@ -52,7 +52,7 @@ module.exports = {
 
   bootstrap: function () {
     mainApplication.registerModules();
-    mainApplication.start().then(function (result) {
+    return mainApplication.start().then(function (result) {
       deferredMainApplicationStarted.resolve(result);
       return result;
     });
