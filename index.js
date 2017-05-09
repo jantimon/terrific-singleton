@@ -54,7 +54,7 @@ module.exports = {
    * Returns a promise which will be resolved once the
    * terrific bootstrap is finished
    */
-  waitForBootstrap () {
+  waitForBootstrap: function () {
     return deferredMainApplicationStarted.promise;
   },
 
