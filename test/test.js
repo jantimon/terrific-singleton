@@ -8,13 +8,13 @@ var sinon = require('sinon');
 
 describe('terrific-singleton', function () {
   var ts;
-  var bs;
+  var bootstrapResult;
   jsdom({skipWindowCheck: true});
   global.Element = { prototype: { matches: function () { return false; } } };
 
   before(function () {
     ts = require('../index.js');
-    bs = ts.bootstrap();
+    bootstrapResult = ts.bootstrap();
   });
 
   describe('API methods are present', function () {
@@ -83,7 +83,19 @@ describe('terrific-singleton', function () {
     });
 
     it('returns a Promise', function () {
-      assert(bs instanceof Promise);
+      assert(bootstrapResult instanceof Promise);
+    });
+
+    it('returns a Promise which gets resolved', function (done) {
+      bootstrapResult.then(function () {
+        done();
+      });
+    });
+  });
+
+  describe('waitForBootstrap', function () {
+    it('returns a Promise', function () {
+      assert.equal(bootstrapResult, ts.waitForBootstrap());
     });
   });
 

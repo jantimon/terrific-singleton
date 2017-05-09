@@ -50,12 +50,24 @@ module.exports = {
     }
   },
 
+  /**
+   * Returns a promise which will be resolved once the
+   * terrific bootstrap is finished
+   */
+  waitForBootstrap () {
+    return deferredMainApplicationStarted.promise;
+  },
+
+  /**
+   * Start all terrific components which where registrered
+   * and initialize all terrific modules found in the current dom
+   */
   bootstrap: function () {
     mainApplication.registerModules();
-    return mainApplication.start().then(function (result) {
+    mainApplication.start().then(function (result) {
       deferredMainApplicationStarted.resolve(result);
-      return result;
     });
+    return this.waitForBootstrap();
   },
 
   createModule: function (moduleName, moduleDefinitions) {
