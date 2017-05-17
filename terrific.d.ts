@@ -1,4 +1,4 @@
-declare interface TerrificModule {
+export interface TerrificModule {
   _ctx?: HTMLElement;
   api?: any;
   start(resolve: (value?: any) => void, reject?: (error?: any) => void): void;
@@ -6,7 +6,7 @@ declare interface TerrificModule {
   [others: string]: any;
 }
 
-declare class TerrificEventEmitter {
+export class TerrificEventEmitter {
     _listeners: any;
     _sandbox: TerrificSandbox;
     _connected: boolean;
@@ -31,7 +31,7 @@ declare class TerrificEventEmitter {
     disconnect(): TerrificEventEmitter;
 }
 
-declare class TerrificSandbox {
+export class TerrificSandbox {
     _application: any;
     _eventEmitters: TerrificEventEmitter[];
 

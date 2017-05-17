@@ -1,4 +1,4 @@
-/// <reference path="terrific.d.ts" />
+import { TerrificModule } from './terrific';
 import {TerrificSpec} from './terrific-module';
 
 interface ITerrificSpec {

@@ -1,4 +1,4 @@
-/// <reference path="terrific.d.ts" />
+import { TerrificModule } from './terrific';
 
 export abstract class TerrificSpec implements TerrificModule {
   _ctx: HTMLElement;
