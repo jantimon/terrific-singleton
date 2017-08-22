@@ -45,14 +45,12 @@ describe('terrific-singleton', function () {
         ts.createModule(true);
       }, Error);
     });
-    it('fails for missing object', function () {
-      assert.throws(function () {
-        ts.createModule('SomeMod');
-      }, Error);
-    });
-    it('returns an object', function () {
-      var mod = ts.createModule('SomeMod', {});
-      assert.isFunction(mod);
+    it('registers the module', function () {
+      ts.createModule('SomeMod', {
+        testProperty: 'foo'
+      });
+      assert.isFunction(ts.Module['SomeMod']);
+      assert.equal(new ts.Module['SomeMod']().testProperty, 'foo');
     });
     it('can be initialized with a class', function () {
       function ModuleClass () { }
@@ -61,19 +59,29 @@ describe('terrific-singleton', function () {
       };
       ModuleClass.prototype.stop = function () {
       };
-      var mod = ts.createModule('ClassMod', ModuleClass);
-      assert.isFunction(mod);
+      ts.createModule('ClassMod', ModuleClass);
+      assert.isFunction(ts.Module['ClassMod']);
     });
     it('fails for double registration', function () {
       assert.throws(function () {
         ts.createModule('SomeMod', {});
       }, Error);
     });
+    it('can be initialized with a class decorator', function () {
+      function ModuleClass () { }
+      ModuleClass.prototype.start = function (resolve) {
+        resolve();
+      };
+      ModuleClass.prototype.stop = function () {
+      };
+      ts.createModule('ClassDecoratorMod')(ModuleClass);
+      assert.isFunction(ts.Module['ClassDecoratorMod']);
+    });
   });
 
   describe('bootstrap', function () {
     it('launches the main application', function () {
-      sinon.stub(ts.mainApplication, 'start').onCall(0).returns(Promise.resolve());
+      sinon.stub(ts.mainApplication, 'start').returns(Promise.resolve());
       sinon.stub(ts.mainApplication, 'registerModules');
       ts.bootstrap();
       assert(ts.mainApplication.start.calledOnce);
@@ -99,6 +107,63 @@ describe('terrific-singleton', function () {
     });
   });
 
+  describe('waitForModuleInitialisiation', function () {
+    it('returns a Promise', function () {
+      assert.isFunction(ts.waitForModuleInitialisiation().then);
+    });
+    it('returns a Promise', function (done) {
+      ts.waitForModuleInitialisiation()
+        .then(function () {
+          assert(true, 'Promise was executed');
+        })
+        .then(done);
+    });
+    it('waits for new modules', function (done) {
+      ts.waitForModuleInitialisiation()
+        .then(function () {
+          assert(true, 'Promise was executed');
+        })
+        .then(done);
+    });
+    it('waits for a slow module', function (done) {
+      sinon.stub(ts.mainApplication, 'start').callsFake(function (mods) {
+        return new Promise(function (resolve) {
+          // Start all modules
+          return mods && mods.length
+            // Called by ts.startNode()
+            ? mods[0].start(resolve)
+            // Called by ts.bootstrap()
+            : new Promise(function (resolve) {
+              setTimeout(resolve);
+            });
+        });
+      });
+      sinon.stub(ts.mainApplication, 'registerModules');
+      var finished = false;
+      var el = document.createElement('div');
+      el.setAttribute('data-t-name', 'SlowMod');
+      ts.createModule('SlowMod', {
+        start: function (resolve) {
+          setTimeout(function () {
+            finished = true;
+            resolve();
+          });
+        }
+      });
+      ts.bootstrap();
+      var allNodesComplete = ts.waitForModuleInitialisiation();
+      // Simulate a lazy loaded component
+      ts.startNode(el);
+      // Verify that we waited for startNode
+      allNodesComplete.then(function () {
+        assert.equal(finished, true, 'Waited for slow mod');
+        ts.mainApplication.start.restore();
+        ts.mainApplication.registerModules.restore();
+        done();
+      });
+    });
+  });
+
   describe('startNode', function () {
     it('fails without arguments', function () {
       return assert.isRejected(ts.startNode(), Error);
@@ -115,7 +180,7 @@ describe('terrific-singleton', function () {
     it('returns object for correctly setup module', function () {
       var el = document.createElement('div');
       el.setAttribute('data-t-name', 'TestMod');
-      sinon.stub(ts.mainApplication, 'start').onCall(0).returns(Promise.resolve());
+      sinon.stub(ts.mainApplication, 'start').returns(Promise.resolve());
       sinon.stub(ts.mainApplication, 'registerModules');
       ts.createModule('TestMod', {});
       ts.bootstrap();
