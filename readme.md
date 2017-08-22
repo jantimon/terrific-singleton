@@ -24,8 +24,23 @@ createModule('DatePicker', {
 
 ## ES6 classes
 
-With ES6 classes you get better intellisense and other advantages of ES6 classes
-and typings.
+Get all advantages of ES6 classes like better ide intellisense for your terrific modules:
+
+```js
+import { createModule } from 'terrific-singleton'
+
+createModule('DatePicker', class DatePicker {
+  start(resolve) {
+    resolve()
+  }
+})
+```
+
+
+## Typings for modules
+
+Typings for the base modules are included to give you autocomplete apis like `this._ctx`  
+Furthermore you can export the class which will provide the typings if public methods are used by `getModuleByDomNode`
 
 ```js
 import { createModule } from 'terrific-singleton'
@@ -35,22 +50,8 @@ export default class DatePicker extends TerrificSpec {
   start(resolve) {
     resolve()
   }
-} 
-createModule('DatePicker', DatePicker)
-```
-
-
-## Typings for modules
-
-This package provides typings for your classes
-
-```js
-import { createModule } from 'terrific-singleton'
-import { TerrificSpec } from 'terrific-singleton/terrific-module'
-
-export default class DatePicker extends TerrificSpec {
-  start(resolve) {
-    resolve()
+  setValue(newValue) {
+    this._ctx.setAttribute('value', newValue);
   }
 } 
 createModule('DatePicker', DatePicker)
@@ -59,7 +60,7 @@ createModule('DatePicker', DatePicker)
 
 ## Decorators
 
-Instead of calling create module after the class you can also use createModule as a decorator
+The `createModule` function can also be used as decorator.
 
 ```js
 import { createModule } from 'terrific-singleton'
